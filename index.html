@@ -214,6 +214,22 @@
       background: rgba(128, 128, 128, 0.35);
       border-radius: 9999px;
     }
+
+    /* Background Image Lightbox Modal */
+    #imageModal {
+      transition: opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    #imageModal .modal-dialog {
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+    }
+    #imageModal.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #imageModal.is-open .modal-dialog {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
   </style>
 </head>
 <body class="bg-obsidian text-zinc-100 motion-enabled min-h-screen antialiased selection:bg-amber-400 selection:text-black">
@@ -299,7 +315,7 @@
     
     <!-- Subtle editorial legend -->
     <div class="flex flex-wrap items-center justify-between gap-2 pb-6 mb-6 border-b border-zinc-800/60 text-xs text-zinc-400" id="legendBar">
-      <p>Each phrase is a live typographic window into its activity. Click a title to mark as <span class="text-amber-400 font-semibold">Today's Pick</span>, or click <span class="underline decoration-dotted">Peek Scene</span> to open the full shutter.</p>
+      <p>Each phrase is a live typographic window into its activity. Click a title to mark as <span class="text-amber-400 font-semibold">Today's Pick</span>, <span class="underline decoration-dotted">Peek Scene</span> to open the shutter, or <span class="underline decoration-dotted">View Image</span> to open the full photo.</p>
       <div class="flex items-center gap-3">
         <span id="activeFilterBadge" class="hidden px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-400 font-medium"></span>
       </div>
@@ -323,6 +339,45 @@
     <span id="toastText">Spotlight selected!</span>
   </div>
 
+  <!-- Full Background Image Modal -->
+  <div id="imageModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="imageModalTitle"
+    aria-hidden="true"
+    class="fixed inset-0 z-[60] hidden opacity-0 pointer-events-none bg-black/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-6">
+    <div class="modal-dialog relative max-w-5xl w-full flex flex-col items-center scale-95 translate-y-2 opacity-0">
+      <!-- Top caption & close bar -->
+      <div class="w-full flex items-center justify-between gap-4 mb-3 text-white">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span id="imageModalIndex" class="font-mono text-xs font-semibold text-amber-400 shrink-0"></span>
+          <h3 id="imageModalTitle" class="text-sm sm:text-base font-semibold truncate"></h3>
+          <span id="imageModalTag" class="hidden sm:inline-block text-[10px] uppercase tracking-widest font-semibold px-2 py-0.5 rounded-full border border-zinc-700 text-zinc-300 bg-zinc-900/80 shrink-0"></span>
+        </div>
+        <button id="imageModalClose" type="button"
+          aria-label="Close image modal"
+          class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-900/90 hover:bg-zinc-800 text-zinc-200 border border-zinc-700/80 transition-colors cursor-pointer flex items-center gap-1.5 shrink-0">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          <span>Close</span>
+        </button>
+      </div>
+
+      <!-- Image frame -->
+      <div id="imageModalFrame" class="relative w-full flex items-center justify-center rounded-2xl overflow-hidden bg-zinc-950/70 border border-zinc-800/80 shadow-2xl">
+        <img id="imageModalImg"
+          src=""
+          alt=""
+          class="block max-h-[80vh] max-w-full w-auto h-auto object-contain select-none" />
+        <div id="imageModalFallback" class="hidden w-full h-[55vh] flex flex-col items-center justify-center p-6 text-center text-white">
+          <p class="text-sm font-semibold drop-shadow">Image unavailable</p>
+          <p class="text-xs text-white/80 mt-1">Showing fallback backdrop</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     /**
      * 29 Curated Activities mapped to custom local images from notes.txt
@@ -334,7 +389,7 @@
         id: 1,
         phrase: 'Pickup Basketball',
         tag: 'Hoops & Gym',
-        image: 'images/basketball.png',
+        image: 'images/basketball.webp',
         focalPosition: 'center 42%',
         fallbackGradient: 'linear-gradient(125deg, #1d4ed8 0%, #f97316 55%, #facc15 100%)',
         motionClass: 'motion-a'
@@ -343,7 +398,7 @@
         id: 2,
         phrase: 'AllSport Soccer',
         tag: 'Turf & Pitch',
-        image: 'images/soccer.png',
+        image: 'images/soccer.webp',
         focalPosition: 'center 34%',
         fallbackGradient: 'linear-gradient(125deg, #11998e 0%, #84cc16 55%, #0284c7 100%)',
         motionClass: 'motion-b'
@@ -361,7 +416,7 @@
         id: 4,
         phrase: '"Mr. Nice Try" Comic',
         tag: 'Illustration',
-        image: 'images/comic.JPEG',
+        image: 'images/comic.webp',
         focalPosition: 'center 40%',
         fallbackGradient: 'linear-gradient(125deg, #f59e0b 0%, #ec4899 45%, #3b82f6 100%)',
         motionClass: 'motion-a'
@@ -370,7 +425,7 @@
         id: 5,
         phrase: 'Hike & Camp w/ Sid',
         tag: 'Outdoors',
-        image: 'images/camp_sid.png',
+        image: 'images/camp_sid.webp',
         focalPosition: 'center 36%',
         fallbackGradient: 'linear-gradient(125deg, #0284c7 0%, #38bdf8 48%, #15803d 100%)',
         motionClass: 'motion-b'
@@ -379,7 +434,7 @@
         id: 6,
         phrase: 'LEGO Builds',
         tag: 'Engineering',
-        image: 'images/lego.JPEG',
+        image: 'images/lego.webp',
         focalPosition: 'center 48%',
         fallbackGradient: 'linear-gradient(125deg, #e52d27 0%, #ffdd00 45%, #0072ff 100%)',
         motionClass: 'motion-c'
@@ -388,7 +443,7 @@
         id: 7,
         phrase: 'Shop Woodworking',
         tag: 'Craftsmanship',
-        image: 'images/wood.png',
+        image: 'images/wood.webp',
         focalPosition: 'center 42%',
         fallbackGradient: 'linear-gradient(125deg, #ea580c 0%, #facc15 50%, #78350f 100%)',
         motionClass: 'motion-a'
@@ -397,7 +452,7 @@
         id: 8,
         phrase: 'Golf & Driving Range',
         tag: 'Precision',
-        image: 'images/golf.png',
+        image: 'images/golf.webp',
         focalPosition: 'center 42%',
         fallbackGradient: 'linear-gradient(125deg, #56ab2f 0%, #a8e063 50%, #2980b9 100%)',
         motionClass: 'motion-b'
@@ -406,7 +461,7 @@
         id: 9,
         phrase: 'AI Game Design',
         tag: 'Code & Worlds',
-        image: 'images/ai.JPEG',
+        image: 'images/ai.webp',
         focalPosition: 'center 44%',
         fallbackGradient: 'linear-gradient(125deg, #dc2626 0%, #f59e0b 48%, #06b6d4 100%)',
         motionClass: 'motion-c'
@@ -442,7 +497,7 @@
         id: 13,
         phrase: 'Kayaking',
         tag: 'Watercraft',
-        image: 'images/kayak.JPEG',
+        image: 'images/kayak.webp',
         focalPosition: 'center 54%',
         fallbackGradient: 'linear-gradient(125deg, #f97316 0%, #0ea5e9 50%, #15803d 100%)',
         motionClass: 'motion-a'
@@ -451,7 +506,7 @@
         id: 14,
         phrase: 'Graphic Novels & Fiction',
         tag: 'Reading',
-        image: 'images/comic.JPEG',
+        image: 'images/comic.webp',
         focalPosition: 'center 40%',
         fallbackGradient: 'linear-gradient(125deg, #c31432 0%, #240b36 50%, #f5af19 100%)',
         motionClass: 'motion-b'
@@ -460,7 +515,7 @@
         id: 15,
         phrase: 'Creative Writing',
         tag: 'Type & Ink',
-        image: 'images/typewriter.JPEG',
+        image: 'images/typewriter.webp',
         focalPosition: 'center 45%',
         fallbackGradient: 'linear-gradient(125deg, #b79891 0%, #94716b 45%, #e65c00 100%)',
         motionClass: 'motion-c'
@@ -487,7 +542,7 @@
         id: 18,
         phrase: 'Chess Practice',
         tag: 'Tactics',
-        image: 'images/chess.JPEG',
+        image: 'images/chess.webp',
         focalPosition: 'center 45%',
         fallbackGradient: 'linear-gradient(125deg, #15803d 0%, #d4af37 50%, #1e293b 100%)',
         motionClass: 'motion-c'
@@ -496,7 +551,7 @@
         id: 19,
         phrase: 'Cook a Meal',
         tag: 'Kitchen',
-        image: 'images/cooking.JPEG',
+        image: 'images/cooking.webp',
         focalPosition: 'center 35%',
         fallbackGradient: 'linear-gradient(125deg, #f59e0b 0%, #0ea5e9 52%, #334155 100%)',
         motionClass: 'motion-a'
@@ -505,7 +560,7 @@
         id: 20,
         phrase: 'Hang Out & Socialize',
         tag: 'Quality Time',
-        image: 'images/olivia.JPEG',
+        image: 'images/olivia.webp',
         focalPosition: 'center 34%',
         fallbackGradient: 'linear-gradient(125deg, #9f1239 0%, #f59e0b 55%, #78350f 100%)',
         motionClass: 'motion-b'
@@ -514,7 +569,7 @@
         id: 21,
         phrase: 'Cousin Hangout',
         tag: 'Extended Crew',
-        image: 'images/cousins.png',
+        image: 'images/cousins.webp',
         focalPosition: 'center 32%',
         fallbackGradient: 'linear-gradient(125deg, #f472b6 0%, #fb923c 50%, #6366f1 100%)',
         motionClass: 'motion-c'
@@ -523,7 +578,7 @@
         id: 22,
         phrase: 'Family Time',
         tag: 'Home & Sun',
-        image: 'images/family.JPEG',
+        image: 'images/family.webp',
         focalPosition: 'center 40%',
         fallbackGradient: 'linear-gradient(125deg, #0284c7 0%, #f59e0b 55%, #fb7185 100%)',
         motionClass: 'motion-a'
@@ -532,7 +587,7 @@
         id: 23,
         phrase: 'Billiards & Pool',
         tag: 'Cue Sports',
-        image: 'images/pool.png',
+        image: 'images/pool.webp',
         focalPosition: 'center 38%',
         fallbackGradient: 'linear-gradient(125deg, #059669 0%, #10b981 48%, #78350f 100%)',
         motionClass: 'motion-b'
@@ -541,7 +596,7 @@
         id: 24,
         phrase: 'Go Swimming',
         tag: 'In the Water',
-        image: 'images/swimming.png',
+        image: 'images/swimming.webp',
         focalPosition: 'center 45%',
         fallbackGradient: 'linear-gradient(125deg, #06b6d4 0%, #2dd4bf 50%, #1d4ed8 100%)',
         motionClass: 'motion-c'
@@ -550,7 +605,7 @@
         id: 25,
         phrase: 'Hang w/ Friends',
         tag: 'The Squad',
-        image: 'images/friends.JPEG',
+        image: 'images/friends.webp',
         focalPosition: 'center 30%',
         fallbackGradient: 'linear-gradient(125deg, #2563eb 0%, #dc2626 50%, #22c55e 100%)',
         motionClass: 'motion-a'
@@ -559,7 +614,7 @@
         id: 26,
         phrase: 'Driving Lessons',
         tag: 'Behind the Wheel',
-        image: 'images/drive.png',
+        image: 'images/drive.webp',
         focalPosition: 'center 26%',
         fallbackGradient: 'linear-gradient(125deg, #16a34a 0%, #84cc16 45%, #334155 100%)',
         motionClass: 'motion-b'
@@ -568,7 +623,7 @@
         id: 27,
         phrase: 'Rando Skillz',
         tag: 'Side Quests',
-        image: 'images/random-skills.png',
+        image: 'images/random-skills.webp',
         focalPosition: 'center 32%',
         fallbackGradient: 'linear-gradient(125deg, #dc2626 0%, #3b82f6 52%, #f59e0b 100%)',
         motionClass: 'motion-c'
@@ -577,7 +632,7 @@
         id: 28,
         phrase: 'Walk the Dog',
         tag: 'Doggo Time',
-        image: 'images/doggo.JPEG',
+        image: 'images/doggo.webp',
         focalPosition: 'center 45%',
         fallbackGradient: 'linear-gradient(125deg, #65a30d 0%, #d97706 55%, #78350f 100%)',
         motionClass: 'motion-a'
@@ -586,7 +641,7 @@
         id: 29,
         phrase: 'Ski the Trails',
         tag: 'Winter & Snow',
-        image: 'images/ski.JPEG',
+        image: 'images/ski.webp',
         focalPosition: 'center 28%',
         fallbackGradient: 'linear-gradient(125deg, #38bdf8 0%, #e2e8f0 50%, #ef4444 100%)',
         motionClass: 'motion-b'
