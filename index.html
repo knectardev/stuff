@@ -217,7 +217,11 @@
 
     /* Background Image Lightbox Modal */
     #imageModal {
+      display: flex;
       transition: opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    #imageModal.hidden {
+      display: none;
     }
     #imageModal .modal-dialog {
       transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
@@ -345,7 +349,7 @@
     aria-modal="true"
     aria-labelledby="imageModalTitle"
     aria-hidden="true"
-    class="fixed inset-0 z-[60] hidden opacity-0 pointer-events-none bg-black/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-6">
+    class="fixed inset-0 z-[60] hidden opacity-0 pointer-events-none bg-black/85 backdrop-blur-md items-center justify-center p-4 sm:p-6">
     <div class="modal-dialog relative w-fit max-w-[92vw] min-w-[min(22rem,92vw)] flex flex-col items-center scale-95 translate-y-2 opacity-0">
       <!-- Top caption & close bar -->
       <div class="w-full flex items-center justify-between gap-4 mb-3 text-white">
@@ -370,7 +374,7 @@
           src=""
           alt=""
           class="block max-h-[80vh] max-w-[92vw] w-auto h-auto object-contain select-none" />
-        <div id="imageModalFallback" class="hidden w-[min(36rem,85vw)] h-[50vh] flex flex-col items-center justify-center p-6 text-center text-white">
+        <div id="imageModalFallback" class="hidden w-[min(36rem,85vw)] h-[50vh] flex-col items-center justify-center p-6 text-center text-white">
           <p class="text-sm font-semibold drop-shadow">Image unavailable</p>
           <p class="text-xs text-white/80 mt-1">Showing fallback backdrop</p>
         </div>
@@ -747,6 +751,7 @@
       imageModalTag.textContent = item.tag;
 
       imageModalFallback.classList.add('hidden');
+      imageModalFallback.classList.remove('flex');
       imageModalFallback.style.backgroundImage = item.fallbackGradient;
       imageModalImg.classList.remove('hidden');
       imageModalImg.alt = item.phrase;
@@ -788,6 +793,7 @@
       if (!imageModal.classList.contains('hidden')) {
         imageModalImg.classList.add('hidden');
         imageModalFallback.classList.remove('hidden');
+        imageModalFallback.classList.add('flex');
       }
     });
 
