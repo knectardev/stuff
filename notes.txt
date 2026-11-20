@@ -1,0 +1,30 @@
+	Activity	Image
+	Gym / pickup BBL	basketball
+	AllSport soccer	soccer
+	Paid refereeing	
+	"Mr Nice Try" comic	comic
+	Hike/camp w/Sid	camp_sid
+	Lego builds	lego
+	Shop woodworking	wood
+	Golf / Driving range	golf
+	AI game design	ai
+	Bike with friends	
+	Paper stock trading	
+	Resin 3D printing	
+	Kayaking	kayak
+	Graphic novels & fiction	comic
+	Creative writing	typewriter
+	Community volunteering	
+	PSAT prep	
+	Chess practice	chess
+NEW	Cooking	cooking
+NEW	Socialize	olivia
+NEW	Cousins	cousins
+NEW	Family	family
+NEW	Pool	pool
+NEW	Swimming	swimming
+NEW	Friends	friends
+NEW	Driving lesson	drive
+NEW	Rando Skillz	random-skills
+NEW	Walk dog	doggo
+NEW	Skiing	ski

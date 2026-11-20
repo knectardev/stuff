@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Activity Cut-Out Gallery</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Heavy display typefaces for wide, crisp cut-out windows -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Archivo Black"', 'sans-serif'],
+            sans: ['"Inter"', 'sans-serif'],
+          },
+          colors: {
+            obsidian: '#0b0b0e',
+            galleryLight: '#f4f2ed',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Smooth theme & layout transitions */
+    body {
+      transition: background-color 0.45s cubic-bezier(0.22, 1, 0.36, 1), color 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* Ken Burns continuous live-motion animation inside the cut-out windows */
+    @keyframes kenBurnsPanA {
+      0%   { background-position: 20% 30%; background-size: 135% auto; }
+      50%  { background-position: 80% 70%; background-size: 155% auto; }
+      100% { background-position: 20% 30%; background-size: 135% auto; }
+    }
+
+    @keyframes kenBurnsPanB {
+      0%   { background-position: 75% 25%; background-size: 145% auto; }
+      50%  { background-position: 25% 75%; background-size: 165% auto; }
+      100% { background-position: 75% 25%; background-size: 145% auto; }
+    }
+
+    @keyframes kenBurnsPanC {
+      0%   { background-position: 50% 15%; background-size: 140% auto; }
+      50%  { background-position: 50% 85%; background-size: 160% auto; }
+      100% { background-position: 50% 15%; background-size: 140% auto; }
+    }
+
+    /* Core Typographic Cut-Out Window Styling */
+    .cutout-text {
+      font-family: 'Archivo Black', sans-serif;
+      text-transform: uppercase;
+      line-height: 0.96;
+      letter-spacing: -0.03em;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      background-repeat: no-repeat;
+      background-size: 145% auto;
+      background-position: 50% 50%;
+      /* Subtle stroke definition so delicate counter-forms remain sharp on both light & dark walls */
+      -webkit-text-stroke: 1px rgba(255, 255, 255, 0.14);
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), filter 0.35s ease, -webkit-text-stroke 0.35s ease;
+      will-change: background-position, background-size, transform;
+      user-select: none;
+    }
+
+    html:not(.dark) .cutout-text {
+      -webkit-text-stroke: 1px rgba(15, 15, 20, 0.14);
+    }
+
+    /* Motion states */
+    body.motion-enabled .motion-a {
+      animation: kenBurnsPanA 16s ease-in-out infinite;
+    }
+    body.motion-enabled .motion-b {
+      animation: kenBurnsPanB 19s ease-in-out infinite;
+    }
+    body.motion-enabled .motion-c {
+      animation: kenBurnsPanC 22s ease-in-out infinite;
+    }
+
+    body:not(.motion-enabled) .cutout-text {
+      animation: none !important;
+      background-size: cover;
+      background-position: center center;
+    }
+
+    /* Interactive Phrase Row & Shutter Reveal */
+    .phrase-item {
+      position: relative;
+      transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+    }
+
+    .phrase-item:hover .cutout-text {
+      transform: scale(1.015);
+      filter: contrast(1.12) saturate(1.18);
+    }
+
+    /* Dim non-highlighted items during Spotlight mode */
+    body.spotlight-active .phrase-item:not(.is-spotlight) {
+      opacity: 0.22;
+      filter: grayscale(0.4);
+    }
+
+    body.spotlight-active .phrase-item.is-spotlight {
+      opacity: 1;
+      transform: scale(1.02);
+    }
+
+    /* Full-frame shutter peek overlay when user toggles peek or inspects */
+    .shutter-backdrop {
+      opacity: 0;
+      transform: scale(0.98);
+      transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      pointer-events: none;
+    }
+
+    .phrase-item.peek-open .shutter-backdrop {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Custom subtle scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(128, 128, 128, 0.35);
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-obsidian text-zinc-100 motion-enabled min-h-screen antialiased selection:bg-amber-400 selection:text-black">
+
+  <!-- Top Sticky Minimalist Gallery Header -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-obsidian/80 dark:bg-obsidian/80 border-b border-zinc-800/70 transition-colors duration-300" id="topHeader">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Brand / Gallery Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 via-rose-500 to-indigo-500 flex items-center justify-center shadow-md">
+          <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h10" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-sm sm:text-base font-bold tracking-tight leading-none">
+            WINDOW CUT-OUTS
+          </h1>
+          <p class="text-[11px] text-zinc-400 dark:text-zinc-400 mt-0.5" id="pickCounter">
+            18 Activities &bull; Click any phrase to pick or peek
+          </p>
+        </div>
+      </div>
+
+      <!-- Interactive Controls -->
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- Spin / Spotlight Randomizer Button -->
+        <button id="spinBtn" type="button"
+          class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white shadow-sm hover:shadow transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.3">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span>Spin Idea</span>
+        </button>
+
+        <!-- Clear Spotlight / Picks button (visible when active) -->
+        <button id="resetBtn" type="button"
+          class="hidden px-3 py-2 rounded-xl text-xs font-medium border border-zinc-700/80 hover:bg-zinc-800/60 transition-all cursor-pointer">
+          Reset View
+        </button>
+
+        <!-- Motion On/Off Toggle -->
+        <button id="motionToggle" type="button" aria-pressed="true"
+          class="px-3 py-2 rounded-xl text-xs font-medium border border-zinc-700/70 bg-zinc-900/60 hover:bg-zinc-800/80 transition-all flex items-center gap-1.5 cursor-pointer">
+          <span id="motionDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="motionLabel">Motion: On</span>
+        </button>
+
+        <!-- Light / Dark Gallery Wall Toggle -->
+        <button id="themeToggle" type="button"
+          class="px-3 py-2 rounded-xl text-xs font-medium border border-zinc-700/70 bg-zinc-900/60 hover:bg-zinc-800/80 transition-all flex items-center gap-1.5 cursor-pointer">
+          <svg id="sunIcon" class="w-3.5 h-3.5 text-amber-400 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <svg id="moonIcon" class="w-3.5 h-3.5 text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+          <span id="themeLabel">Dark Wall</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Typographic Cut-Out Wall -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    
+    <!-- Subtle editorial legend -->
+    <div class="flex flex-wrap items-center justify-between gap-2 pb-6 mb-6 border-b border-zinc-800/60 text-xs text-zinc-400" id="legendBar">
+      <p>Each phrase is a live typographic window into its activity. Click a title to mark as <span class="text-amber-400 font-semibold">Today's Pick</span>, or click <span class="underline decoration-dotted">Peek Scene</span> to open the full shutter.</p>
+      <div class="flex items-center gap-3">
+        <span id="activeFilterBadge" class="hidden px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-400 font-medium"></span>
+      </div>
+    </div>
+
+    <!-- Container where the 18 Cut-Out Typographic Windows are rendered -->
+    <section id="cutoutGallery" class="flex flex-col divide-y divide-zinc-800/50" aria-label="Activity Cut-Out Gallery">
+      <!-- Populated dynamically via JavaScript -->
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-zinc-800/50 text-center text-xs text-zinc-500" id="pageFooter">
+    Typographic Cut-Out Edition &bull; 18 Curated Pursuits
+  </footer>
+
+  <!-- Toast notification (non-blocking alternative to alert) -->
+  <div id="toastBanner" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full bg-zinc-900/95 text-white border border-zinc-700 shadow-2xl text-xs font-medium opacity-0 pointer-events-none transition-all duration-300 translate-y-2 flex items-center gap-2">
+    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+    <span id="toastText">Spotlight selected!</span>
+  </div>
+
+  <script>
+    /**
+     * 18 Curated Activities with high-contrast, topic-matched photography
+     * and rich procedural multi-stop fallback gradients so every cut-out letter
+     * looks vivid immediately upon render and animates smoothly inside the text window.
+     */
+    const ACTIVITIES = [
+      {
+        id: 1,
+        phrase: 'Gym / pickup BBL',
+        tag: 'Athletics',
+        image: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=1400&q=85',
+        fallbackGradient: 'linear-gradient(125deg, #ff512f 0%, #f09819 45%, #dd2476 100%)',
+        motionClass: 'motion-a'
+      },
+      {
+        id: 2,
+        phrase: 'AllSport soccer',
+        tag: 'Turf & Pitch',
+        image: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=1400&q=85',
+        fallbackGradient: 'linear-gradient(125deg, #11998e 0%, #38ef7d 55%, #0575e6 100%)',
+        motionClass: 'motion-b'
+      },
+      {
+        id: 3,
+        phrase: 'Paid refereeing',
+        tag: 'Officiating',
+        image: 'https://images.unsplash.com/photo-1518604666860-9ed391f76460?auto=format&fit=crop&w=1400&q=85',
+        fallbackGradient: 'linear-gradient(125deg, #f7971e 0%, #ffd200 50%, #232526 100%)',
+        motionClass: 'motion-c'
+      },
+      {
+        id: 4,
+        phrase: '"Mr Nice Try" comic',
+        tag: 'Illustration',
+        image: 'https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?auto=format&fit=crop&w=1400&q=85',
+        fallbackGradient: 'linear-gradient(125deg, #ff0084 0%, #33001b 40%, #00d2ff 80%, #ffbe0b 100%)',
+        motionClass: 'motion-a'
+      },
+      {
+        id: 5,
+        phrase: 'Hike/camp w/Sid',
+        tag: 'Outdoors',
+        image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1400&q=85',
+        fallbackGradient: 'linear-gradient(125deg, #134e5e 0%, #71b280 50%, #f2994a 100%)',
+        motionClass: 'motion-b'
+      },
+      {
+        id: 6,
+        phrase: 'Lego builds',
+        tag: 'Engineering',
+        image: 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&w=1400&q=85',
+        fallbackGradient: 'linear-gradient(125deg, #e52d27 0%, #ffdd00 45%, #0072ff 100%)',
+        motionClass: 'motion-c'
+      },
+      {
+        id: 7,
+        phrase: 'Shop woodworking',
+        tag: 'Craftsmanship',
+        image: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=1400&q=85',
+        fallbackGradient: 'linear-gradient(125deg, #8e44ad 0%, #d35400 45%, #f39c12 100%)',
+        motionClass: 'motion-a'
+      },
+      {
+        id: 8,
+        phrase: 'Golf / Driving range',
+        tag: 'Precision',
+        image: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?auto=format&fit=crop&w=1400&q=85',
+        fallbackGradient: 'linear-gradient(125deg, #56ab2f 0%, #a8e063 50%, #2980b9 100%)',
+        motionClass: 'motion-b'
+      },
+      {
+        id: 9,
+        phrase: 'AI game design',
+        tag: 'Code & Worlds',
+        image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1400&q=85',
+        fallbackGradient: 'linear-gradient(125deg, #8e2de2 0%, #4a00e0 45%, #00f2fe 100%)',
+        motionClass: 'motion-c'
+      },
+      {
+        id: 10,
+        phrase: 'Bike with friends',
+        tag: 'Trail & Road',
+        image: 'https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=1400&q=85',
+        fallbackGradient: 'linear-gradient(125deg, #f12711 0%, #f5af19 50%, #2c3e50 100%)',
+        motionClass: 'motion-a'
+      },
+      {
+        id: 11,
+        phrase: 'Paper stock trading',
+        tag: 'Markets',
+        image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1400&q=85',
+        fallbackGradient: 'linear-gradient(125deg, #00b09b 0%, #96c93d 50%, #0f2027 100%)',
+        motionClass: 'motion-b'
+      },
+      {
+        id: 12,
+        phrase: 'Resin 3D printing',
+        tag: 'Fabrication',
+        image: 'https://images.unsplash.com/photo-1631541909061-71e349d1f203?auto=format&fit=crop&w=1400&q=85',
+        fallbackGradient: 'linear-gradient(125deg, #3a1c71 0%, #d76d77 50%, #ffaf7b 100%)',
+        motionClass: 'motion-c'
+      },
+      {
+        id: 13,
+        phrase: 'Kayaking',
+        tag: 'Watercraft',
+        image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1400&q=85',
+        fallbackGradient: 'linear-gradient(125deg, #00c6ff 0%, #0072ff 50%, #1cefff 100%)',
+        motionClass: 'motion-a'
+      },
+      {
+        id: 14,
+        phrase: 'Graphic novels & fiction',
+        tag: 'Reading',
+        image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1400&q=85',
+        fallbackGradient: 'linear-gradient(125deg, #c31432 0%, #240b36 50%, #f5af19 100%)',
+        motionClass: 'motion-b'
+      },
+      {
+        id: 15,
+        phrase: 'Creative writing',
+        tag: 'Type & Ink',
+        image: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1400&q=85',
+        fallbackGradient: 'linear-gradient(125deg, #b79891 0%, #94716b 45%, #e65c00 100%)',
+        motionClass: 'motion-c'
+      },
+      {
+        id: 16,
+        phrase: 'Community volunteering',
+        tag: 'Service',
+        image: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=1400&q=85',
+        fallbackGradient: 'linear-gradient(125deg, #ff6a00 0%, #ee0979 55%, #ffb347 100%)',
+        motionClass: 'motion-a'
+      },
+      {
+        id: 17,
+        phrase: 'PSAT prep',
+        tag: 'Focus & Strategy',
+        image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1400&q=85',
+        fallbackGradient: 'linear-gradient(125deg, #1a2980 0%, #26d0ce 60%, #f7971e 100%)',
+        motionClass: 'motion-b'
+      },
+      {
+        id: 18,
+        phrase: 'Chess practice',
+        tag: 'Tactics',
+        image: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?auto=format&fit=crop&w=1400&q=85',
+        fallbackGradient: 'linear-gradient(125deg, #d4af37 0%, #434343 50%, #000000 100%)',
+        motionClass: 'motion-c'
+      }
+    ];
+
+    // State
+    const selectedIds = new Set();
+    let spotlightId = null;
+    let isDarkWall = true;
+    let isMotionOn = true;
+
+    const galleryEl = document.getElementById('cutoutGallery');
+    const pickCounterEl = document.getElementById('pickCounter');
+    const resetBtn = document.getElementById('resetBtn');
+    const spinBtn = document.getElementById('spinBtn');
+    const motionToggle = document.getElementById('motionToggle');
+    const motionDot = document.getElementById('motionDot');
+    const motionLabel = document.getElementById('motionLabel');
+    const themeToggle = document.getElementById('themeToggle');
+    const themeLabel = document.getElementById('themeLabel');
+    const sunIcon = document.getElementById('sunIcon');
+    const moonIcon = document.getElementById('moonIcon');
+    const toastBanner = document.getElementById('toastBanner');
+    const toastText = document.getElementById('toastText');
+
+    let toastTimeout = null;
+    function showToast(message) {
+      toastText.textContent = message;
+      toastBanner.classList.remove('opacity-0', 'translate-y-2');
+      toastBanner.classList.add('opacity-100', 'translate-y-0');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toastBanner.classList.remove('opacity-100', 'translate-y-0');
+        toastBanner.classList.add('opacity-0', 'translate-y-2');
+      }, 2600);
+    }
+
+    /**
+     * Render all 18 typographic cut-out window rows
+     */
+    function renderGallery() {
+      galleryEl.innerHTML = '';
+
+      ACTIVITIES.forEach((item, index) => {
+        const numStr = String(index + 1).padStart(2, '0');
+        const isPicked = selectedIds.has(item.id);
+        const isSpotlight = spotlightId === item.id;
+
+        const row = document.createElement('article');
+        row.id = `activity-row-${item.id}`;
+        row.className = `phrase-item group py-5 sm:py-7 px-2 sm:px-4 rounded-2xl transition-all duration-300 ${
+          isSpotlight ? 'is-spotlight ring-2 ring-amber-400/80 bg-amber-500/5' : ''
+        }`;
+
+        // Compose background-image with photographic URL layered over the rich fallback gradient
+        const layeredBg = `url('${item.image}'), ${item.fallbackGradient}`;
+
+        row.innerHTML = `
+          <!-- Full-frame shutter peek preview (revealed on Peek button click) -->
+          <div class="shutter-backdrop absolute inset-0 rounded-2xl overflow-hidden z-0">
+            <div class="w-full h-full bg-cover bg-center scale-105 transition-transform duration-700"
+                 style="background-image: ${layeredBg};"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-black/75"></div>
+          </div>
+
+          <!-- Foreground Typographic Cut-Out Content -->
+          <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-5">
+            
+            <!-- Left Index + Cut-out Headline -->
+            <div class="flex items-start sm:items-baseline gap-3 sm:gap-5 flex-1 min-w-0 cursor-pointer" data-action="toggle-pick" data-id="${item.id}">
+              <span class="font-mono text-xs sm:text-sm font-semibold tracking-wider pt-1 sm:pt-0 shrink-0 ${
+                isPicked ? 'text-amber-400' : 'text-zinc-500'
+              }">
+                ${numStr}
+              </span>
+
+              <div class="min-w-0 flex-1">
+                <h2 class="cutout-text ${item.motionClass} text-3xl sm:text-5xl md:text-6xl lg:text-[4.15rem] break-words"
+                    style="background-image: ${layeredBg};">
+                  ${item.phrase}
+                </h2>
+              </div>
+            </div>
+
+            <!-- Right Metadata Pill & Interactive Shutter Controls -->
+            <div class="flex items-center justify-between sm:justify-end gap-2.5 pl-7 lg:pl-0 shrink-0">
+              <span class="text-[11px] uppercase tracking-widest font-semibold px-2.5 py-1 rounded-full border ${
+                isDarkWall
+                  ? 'border-zinc-800 text-zinc-400 bg-zinc-900/70'
+                  : 'border-zinc-300 text-zinc-600 bg-white/80'
+              }">
+                ${item.tag}
+              </span>
+
+              <!-- Today's Pick Toggle Button -->
+              <button type="button"
+                data-action="toggle-pick"
+                data-id="${item.id}"
+                class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  isPicked
+                    ? 'bg-amber-400 text-zinc-950 shadow-sm'
+                    : isDarkWall
+                      ? 'bg-zinc-900/90 text-zinc-300 border border-zinc-800 hover:border-zinc-600'
+                      : 'bg-white text-zinc-700 border border-zinc-300 hover:border-zinc-400'
+                }">
+                <span>${isPicked ? '★ Today’s Pick' : '+ Pick'}</span>
+              </button>
+
+              <!-- Window Shutter Peek Button -->
+              <button type="button"
+                data-action="toggle-peek"
+                data-id="${item.id}"
+                class="px-3 py-1.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+                  isDarkWall
+                    ? 'bg-zinc-900/90 text-zinc-300 border border-zinc-800 hover:bg-zinc-800'
+                    : 'bg-white text-zinc-700 border border-zinc-300 hover:bg-zinc-100'
+                }"
+                title="Open window shutter to inspect full photo">
+                Peek Scene
+              </button>
+            </div>
+          </div>
+        `;
+
+        galleryEl.appendChild(row);
+      });
+
+      updateHeaderState();
+    }
+
+    /**
+     * Update counters and reset button visibility
+     */
+    function updateHeaderState() {
+      const count = selectedIds.size;
+      if (count > 0) {
+        pickCounterEl.innerHTML = `<span class="text-amber-400 font-semibold">${count} picked for today</span> &bull; Click any phrase to toggle`;
+      } else {
+        pickCounterEl.textContent = '18 Activities • Click any phrase to pick or peek';
+      }
+
+      if (count > 0 || spotlightId !== null) {
+        resetBtn.classList.remove('hidden');
+      } else {
+        resetBtn.classList.add('hidden');
+      }
+    }
+
+    /**
+     * Handle delegated clicks on Pick and Peek buttons
+     */
+    galleryEl.addEventListener('click', (e) => {
+      const trigger = e.target.closest('[data-action]');
+      if (!trigger) return;
+
+      const action = trigger.getAttribute('data-action');
+      const id = Number(trigger.getAttribute('data-id'));
+      const item = ACTIVITIES.find(a => a.id === id);
+
+      if (action === 'toggle-pick') {
+        if (selectedIds.has(id)) {
+          selectedIds.delete(id);
+          showToast(`Removed "${item.phrase}" from Today's Picks`);
+        } else {
+          selectedIds.add(id);
+          showToast(`Added "${item.phrase}" to Today's Picks ★`);
+        }
+        renderGallery();
+      } else if (action === 'toggle-peek') {
+        const rowEl = document.getElementById(`activity-row-${id}`);
+        const isOpen = rowEl.classList.toggle('peek-open');
+        const heading = rowEl.querySelector('.cutout-text');
+        if (isOpen) {
+          // Make text crisp white over the darkened full-bleed photo while peeking
+          heading.style.webkitTextFillColor = '#ffffff';
+          trigger.textContent = 'Close Shutter';
+        } else {
+          heading.style.webkitTextFillColor = 'transparent';
+          trigger.textContent = 'Peek Scene';
+        }
+      }
+    });
+
+    /**
+     * Spin / Randomizer Spotlight Feature
+     */
+    spinBtn.addEventListener('click', () => {
+      const randomIndex = Math.floor(Math.random() * ACTIVITIES.length);
+      const chosen = ACTIVITIES[randomIndex];
+      spotlightId = chosen.id;
+      document.body.classList.add('spotlight-active');
+      renderGallery();
+
+      const targetRow = document.getElementById(`activity-row-${chosen.id}`);
+      if (targetRow) {
+        targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      showToast(`Spotlight Idea: ${chosen.phrase}`);
+    });
+
+    /**
+     * Reset Spotlight & Picks
+     */
+    resetBtn.addEventListener('click', () => {
+      selectedIds.clear();
+      spotlightId = null;
+      document.body.classList.remove('spotlight-active');
+      renderGallery();
+      showToast('Gallery view reset');
+    });
+
+    /**
+     * Toggle Ken Burns Live Motion inside the Cut-Out Windows
+     */
+    motionToggle.addEventListener('click', () => {
+      isMotionOn = !isMotionOn;
+      document.body.classList.toggle('motion-enabled', isMotionOn);
+      motionLabel.textContent = isMotionOn ? 'Motion: On' : 'Motion: Off';
+      if (isMotionOn) {
+        motionDot.classList.remove('bg-zinc-500');
+        motionDot.classList.add('bg-emerald-400', 'animate-pulse');
+      } else {
+        motionDot.classList.remove('bg-emerald-400', 'animate-pulse');
+        motionDot.classList.add('bg-zinc-500');
+      }
+    });
+
+    /**
+     * Toggle Dark Obsidian vs Light Gallery Wall
+     */
+    themeToggle.addEventListener('click', () => {
+      isDarkWall = !isDarkWall;
+      const htmlEl = document.documentElement;
+      const headerEl = document.getElementById('topHeader');
+      const legendEl = document.getElementById('legendBar');
+      const footerEl = document.getElementById('pageFooter');
+
+      if (isDarkWall) {
+        htmlEl.classList.add('dark');
+        document.body.classList.remove('bg-galleryLight', 'text-zinc-900');
+        document.body.classList.add('bg-obsidian', 'text-zinc-100');
+        headerEl.className = 'sticky top-0 z-40 backdrop-blur-md bg-obsidian/85 border-b border-zinc-800/70 transition-colors duration-300';
+        galleryEl.className = 'flex flex-col divide-y divide-zinc-800/50';
+        legendEl.className = 'flex flex-wrap items-center justify-between gap-2 pb-6 mb-6 border-b border-zinc-800/60 text-xs text-zinc-400';
+        footerEl.className = 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-zinc-800/50 text-center text-xs text-zinc-500';
+        motionToggle.className = 'px-3 py-2 rounded-xl text-xs font-medium border border-zinc-700/70 bg-zinc-900/60 hover:bg-zinc-800/80 transition-all flex items-center gap-1.5 cursor-pointer';
+        themeToggle.className = 'px-3 py-2 rounded-xl text-xs font-medium border border-zinc-700/70 bg-zinc-900/60 hover:bg-zinc-800/80 transition-all flex items-center gap-1.5 cursor-pointer';
+        themeLabel.textContent = 'Dark Wall';
+        moonIcon.classList.remove('hidden');
+        sunIcon.classList.add('hidden');
+      } else {
+        htmlEl.classList.remove('dark');
+        document.body.classList.remove('bg-obsidian', 'text-zinc-100');
+        document.body.classList.add('bg-galleryLight', 'text-zinc-900');
+        headerEl.className = 'sticky top-0 z-40 backdrop-blur-md bg-galleryLight/85 border-b border-zinc-300/80 transition-colors duration-300';
+        galleryEl.className = 'flex flex-col divide-y divide-zinc-300/70';
+        legendEl.className = 'flex flex-wrap items-center justify-between gap-2 pb-6 mb-6 border-b border-zinc-300/80 text-xs text-zinc-600';
+        footerEl.className = 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-zinc-300/70 text-center text-xs text-zinc-500';
+        motionToggle.className = 'px-3 py-2 rounded-xl text-xs font-medium border border-zinc-300 bg-white/80 hover:bg-white text-zinc-800 transition-all flex items-center gap-1.5 cursor-pointer';
+        themeToggle.className = 'px-3 py-2 rounded-xl text-xs font-medium border border-zinc-300 bg-white/80 hover:bg-white text-zinc-800 transition-all flex items-center gap-1.5 cursor-pointer';
+        themeLabel.textContent = 'Light Wall';
+        sunIcon.classList.remove('hidden');
+        moonIcon.classList.add('hidden');
+      }
+
+      renderGallery();
+    });
+
+    // Initial render
+    renderGallery();
+  </script>
+</body>
+</html>
